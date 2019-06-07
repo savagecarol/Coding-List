@@ -1,15 +1,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="io.github.vikasgola.coding_list">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
+        <!-- android:name="io.flutter.app.FlutterApplication" -->
     <application
-        android:name="io.flutter.app.FlutterApplication"
-        android:label="coding_list"
+        tools:replace="android:label"
+        android:label="Coding List"
+        android:name=".Application"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2643040473892428~6996314381"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
