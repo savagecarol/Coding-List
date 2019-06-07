@@ -57,6 +57,7 @@ class HomePage extends StatefulWidget {
 
 class _HomeState extends State<HomePage> {
   int _currentIndex = 0;
+  final PageStorageBucket bucket = PageStorageBucket();
   final List<Widget> _children = [
     FutureBuilder<Contests>(
       future: liveContests,
@@ -105,7 +106,7 @@ class _HomeState extends State<HomePage> {
       appBar: AppBar(
         title: Text('Coding List'),
       ),
-      body: _children[_currentIndex],
+      body: PageStorage(bucket: bucket,child: _children[_currentIndex],),
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
         currentIndex: _currentIndex,
@@ -131,7 +132,6 @@ class _HomeState extends State<HomePage> {
 class ContestListWidget extends StatelessWidget {
   final String which;
   final List<Contest> contests;
-
   ContestListWidget(this.which, this.contests);
 
   @override
@@ -155,6 +155,7 @@ class ContestListWidget extends StatelessWidget {
     return Container(
       child: ListView.separated(
         physics: BouncingScrollPhysics(),
+        key: PageStorageKey(this.which),
         itemBuilder: (context, position) {
           var start = this.contests[position].start.toString().split(" ");
           var end = this.contests[position].end.toString().split(" ");
@@ -214,7 +215,7 @@ class ContestListWidget extends StatelessWidget {
               ));
         },
         separatorBuilder: (context, position) {
-          if (position % 4 == 0 && position != 0) {
+          if (position % 4 == 0) {
             return Container(
               margin: EdgeInsets.only(bottom: 20.0),
               child: Padding(
