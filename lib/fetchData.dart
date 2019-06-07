@@ -30,16 +30,28 @@ import 'package:http/http.dart' as http;
 // }
 
 Future<Contests> liveContests =
-    fetchContests("start", DateTime.now().toUtc().toString(), "start");
+    fetchContests("mid", DateTime.now().toUtc().toString(), "start");
 Future<Contests> completedContests =
-    fetchContests("start__lt", DateTime.now().toUtc().toString(), "end");
+    fetchContests("end__lt", DateTime.now().toUtc().toString(), "-start");
 Future<Contests> upcomingContests =
     fetchContests("start__gt", DateTime.now().toUtc().toString(), "start");
 
 Future<Contests> fetchContests(
     String param, String today, String orderBy) async {
   var uri;
-  if (orderBy == "end") {
+  if (param == "mid") {
+    uri = Uri.https("clist.by", "/api/v1/contest/", {
+      "username": "vikasgola2015",
+      "api_key": "6c30bec036ad99b28c94e98fb584ab880efb04b6",
+      "start__lt": today,
+      "end__gt": today,
+      "order_by": orderBy,
+      "limit": "1000",
+      'start__gt': DateTime(
+              DateTime.now().year, DateTime.now().month - 1, DateTime.now().day)
+          .toString()
+    });
+  } else if (orderBy == "end") {
     uri = Uri.https("clist.by", "/api/v1/contest/", {
       "username": "vikasgola2015",
       "api_key": "6c30bec036ad99b28c94e98fb584ab880efb04b6",
@@ -62,7 +74,7 @@ Future<Contests> fetchContests(
 
   var response;
   response = await http.get(uri);
-  
+
   if (response.statusCode == 200) {
     // If server returns an OK response, parse the JSON
     return Contests.fromJSON(json.decode(response.body));
