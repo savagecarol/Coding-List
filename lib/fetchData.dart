@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 // class FetchData {
@@ -37,7 +38,6 @@ Future<Contests> upcomingContests =
 
 Future<Contests> fetchContests(
     String param, String today, String orderBy) async {
-
   var uri;
   if (orderBy == "end") {
     uri = Uri.https("clist.by", "/api/v1/contest/", {
@@ -60,8 +60,9 @@ Future<Contests> fetchContests(
     });
   }
 
-  final response = await http.get(uri);
-
+  var response;
+  response = await http.get(uri);
+  
   if (response.statusCode == 200) {
     // If server returns an OK response, parse the JSON
     return Contests.fromJSON(json.decode(response.body));
@@ -102,8 +103,8 @@ class Contest {
   });
 
   factory Contest.fromJSON(Map<String, dynamic> json) {
-    var start = DateTime.parse(json['start']+"Z");
-    var end = DateTime.parse(json['end']+"Z");
+    var start = DateTime.parse(json['start'] + "Z");
+    var end = DateTime.parse(json['end'] + "Z");
     return Contest(
       id: json['id'],
       event: json['event'],

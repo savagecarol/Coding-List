@@ -1,5 +1,6 @@
 import 'package:coding_list/fetchData.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:admob_flutter/admob_flutter.dart';
 import 'dart:io';
@@ -30,6 +31,31 @@ launchURL(String url) async {
   }
 }
 
+class ErrorCardWidget extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+          onTap: (){
+            SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+          },
+          child: Container(
+          child: Center(
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  "No internet!!! Try restarting App.",
+                  style: TextStyle(fontSize: 22.0),
+                ),
+              ),
+            ),
+          ),
+        ),
+    );
+  }
+
+}
+
 class ProgressBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -40,7 +66,10 @@ class ProgressBarWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             new CircularProgressIndicator(),
-            Container(child: new Text("Loading..."), margin: EdgeInsets.only(left: 16.0),),
+            Container(
+              child: new Text("Loading..."),
+              margin: EdgeInsets.only(left: 16.0),
+            ),
           ],
         ),
       ),
@@ -65,7 +94,7 @@ class _HomeState extends State<HomePage> {
         if (snapshot.hasData) {
           return ContestListWidget("live", snapshot.data.contests);
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          return ErrorCardWidget();
         }
         return ProgressBarWidget();
       },
@@ -76,7 +105,7 @@ class _HomeState extends State<HomePage> {
         if (snapshot.hasData) {
           return ContestListWidget("upcoming", snapshot.data.contests);
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          return ErrorCardWidget();
         }
         return ProgressBarWidget();
       },
@@ -87,7 +116,7 @@ class _HomeState extends State<HomePage> {
         if (snapshot.hasData) {
           return ContestListWidget("completed", snapshot.data.contests);
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          return ErrorCardWidget();
         }
         return ProgressBarWidget();
       },
@@ -106,7 +135,10 @@ class _HomeState extends State<HomePage> {
       appBar: AppBar(
         title: Text('Coding List'),
       ),
-      body: PageStorage(bucket: bucket,child: _children[_currentIndex],),
+      body: PageStorage(
+        bucket: bucket,
+        child: _children[_currentIndex],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
         currentIndex: _currentIndex,
@@ -131,6 +163,7 @@ class _HomeState extends State<HomePage> {
 
 class ContestListWidget extends StatelessWidget {
   final String which;
+  final navigatorKey = GlobalKey<NavigatorState>();
   final List<Contest> contests;
   ContestListWidget(this.which, this.contests);
 
