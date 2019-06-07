@@ -30,7 +30,7 @@ import 'package:http/http.dart' as http;
 // }
 
 Future<Contests> liveContests =
-    fetchContests("mid", DateTime.now().toUtc().toString(), "start");
+    fetchContests("mid", DateTime.now().toUtc().toString(), "-start");
 Future<Contests> completedContests =
     fetchContests("end__lt", DateTime.now().toUtc().toString(), "-start");
 Future<Contests> upcomingContests =
