@@ -1,10 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:coding_list/tabs.dart';
 import 'package:admob_flutter/admob_flutter.dart';
-// import 'package:background_fetch/background_fetch.dart';
-// import 'dart:async';
-// import 'package:flutter/services.dart';
 
 main() {
   Admob.initialize(getAppId());
@@ -18,8 +14,6 @@ main() {
 //   print('[BackgroundFetch] Headless event received.');
 //   BackgroundFetch.finish();
 // }
-
-
 
 class App extends StatelessWidget {
   @override

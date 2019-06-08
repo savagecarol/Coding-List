@@ -30,6 +30,8 @@
 	<string>ca-app-pub-2643040473892428~6996314381</string>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+	<key>io.flutter.embedded_views_preview</key>
+	<string>YES</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
