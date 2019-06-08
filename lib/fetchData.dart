@@ -45,21 +45,7 @@ Future<Contests> fetchContests(
       "start__lt": today,
       "end__gt": today,
       "order_by": orderBy,
-      "limit": "1000",
-      'start__gt': DateTime(
-              DateTime.now().year, DateTime.now().month - 1, DateTime.now().day)
-          .toString()
-    });
-  } else if (orderBy == "end") {
-    uri = Uri.https("clist.by", "/api/v1/contest/", {
-      "username": "vikasgola2015",
-      "api_key": "6c30bec036ad99b28c94e98fb584ab880efb04b6",
-      param: today,
-      "order_by": orderBy,
-      "limit": "1000",
-      'start__gt': DateTime(
-              DateTime.now().year, DateTime.now().month - 1, DateTime.now().day)
-          .toString()
+      "limit": "100",
     });
   } else {
     uri = Uri.https("clist.by", "/api/v1/contest/", {
@@ -67,7 +53,7 @@ Future<Contests> fetchContests(
       "api_key": "6c30bec036ad99b28c94e98fb584ab880efb04b6",
       param: today,
       "order_by": orderBy,
-      "limit": "1000"
+      "limit": "100"
     });
   }
 

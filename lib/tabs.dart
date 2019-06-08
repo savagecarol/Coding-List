@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:admob_flutter/admob_flutter.dart';
 import 'dart:io';
+import 'package:share/share.dart';
 
 String getAppId() {
   if (Platform.isIOS) {
@@ -31,29 +32,28 @@ launchURL(String url) async {
   }
 }
 
-class ErrorCardWidget extends StatelessWidget{
+class ErrorCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-          onTap: (){
-            SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-          },
-          child: Container(
-          child: Center(
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  "No internet!!! Try restarting App.",
-                  style: TextStyle(fontSize: 22.0),
-                ),
+      onTap: () {
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+      },
+      child: Container(
+        child: Center(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "No internet!!! Try restarting App.",
+                style: TextStyle(fontSize: 20.0),
               ),
             ),
           ),
         ),
+      ),
     );
   }
-
 }
 
 class ProgressBarWidget extends StatelessWidget {
@@ -61,7 +61,7 @@ class ProgressBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Dialog(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(24.0),
         child: new Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -86,42 +86,17 @@ class HomePage extends StatefulWidget {
 
 class _HomeState extends State<HomePage> {
   int _currentIndex = 0;
+  final key = new GlobalKey<ScaffoldState>();
   final PageStorageBucket bucket = PageStorageBucket();
-  final List<Widget> _children = [
-    FutureBuilder<Contests>(
-      future: liveContests,
-      builder: (contests, snapshot) {
-        if (snapshot.hasData) {
-          return ContestListWidget("live", snapshot.data.contests);
-        } else if (snapshot.hasError) {
-          return ErrorCardWidget();
-        }
-        return ProgressBarWidget();
-      },
-    ),
-    FutureBuilder<Contests>(
-      future: upcomingContests,
-      builder: (contests, snapshot) {
-        if (snapshot.hasData) {
-          return ContestListWidget("upcoming", snapshot.data.contests);
-        } else if (snapshot.hasError) {
-          return ErrorCardWidget();
-        }
-        return ProgressBarWidget();
-      },
-    ),
-    FutureBuilder<Contests>(
-      future: completedContests,
-      builder: (contests, snapshot) {
-        if (snapshot.hasData) {
-          return ContestListWidget("completed", snapshot.data.contests);
-        } else if (snapshot.hasError) {
-          return ErrorCardWidget();
-        }
-        return ProgressBarWidget();
-      },
-    )
-  ];
+  List<Widget> _children = [];
+  Icon actionIcon = new Icon(
+    Icons.search,
+    color: Colors.white,
+  );
+  Widget appBarTitle = Text('Coding List');
+  final TextEditingController _searchQuery = new TextEditingController();
+  bool _isSearching = false;
+  String _searchText = "";
 
   void onTabTapped(int index) {
     setState(() {
@@ -129,11 +104,135 @@ class _HomeState extends State<HomePage> {
     });
   }
 
+  void _handleSearchEnd() {
+    setState(() {
+      this.actionIcon = new Icon(
+        Icons.search,
+        color: Colors.white,
+      );
+      this.appBarTitle = Text('Coding List');
+      _isSearching = false;
+      _searchQuery.clear();
+    });
+  }
+
+  void _handleSearchStart() {
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  _HomeState(){
+    _searchQuery.addListener(() {
+      if (_searchQuery.text.isEmpty) {
+        setState(() {
+          _isSearching = false;
+          _searchText = "";
+        });
+      }
+      else {
+        setState(() {
+          _isSearching = true;
+          _searchText = _searchQuery.text;
+        });
+      }
+    });
+  }
+
+  List<Contest> getSearchContests(List<Contest> allcontests){
+    if(_searchText.isEmpty){
+      return allcontests;
+    }
+
+    List<Contest> _list = [];
+    for (var i = 0; i < allcontests.length; i++) {
+      if(allcontests[i].event.toLowerCase().contains(_searchText.toLowerCase()) || allcontests[i].resource.toLowerCase().contains(_searchText.toLowerCase())){
+        _list.add(allcontests[i]);
+      }
+    }
+
+    return _list;
+  }
+
   @override
   Widget build(BuildContext context) {
+    _children = [
+      FutureBuilder<Contests>(
+        future: liveContests,
+        builder: (contests, snapshot) {
+          if (snapshot.hasData) {
+            return ContestListWidget("live", _isSearching ? getSearchContests(snapshot.data.contests) : snapshot.data.contests);
+          } else if (snapshot.hasError) {
+            return ErrorCardWidget();
+          }
+          return ProgressBarWidget();
+        },
+      ),
+      FutureBuilder<Contests>(
+        future: upcomingContests,
+        builder: (contests, snapshot) {
+          if (snapshot.hasData) {
+            return ContestListWidget("upcoming", _isSearching ? getSearchContests(snapshot.data.contests) : snapshot.data.contests);
+          } else if (snapshot.hasError) {
+            return ErrorCardWidget();
+          }
+          return ProgressBarWidget();
+        },
+      ),
+      FutureBuilder<Contests>(
+        future: completedContests,
+        builder: (contests, snapshot) {
+          if (snapshot.hasData) {
+            return ContestListWidget("completed", _isSearching ? getSearchContests(snapshot.data.contests) : snapshot.data.contests);
+          } else if (snapshot.hasError) {
+            return ErrorCardWidget();
+          }
+          return ProgressBarWidget();
+        },
+      )
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Coding List'),
+        title: this.appBarTitle,
+        key: this.key,
+        // centerTitle: true,
+        actions: <Widget>[
+          new IconButton(
+            icon: this.actionIcon,
+            onPressed: () {
+              setState(() {
+                if (this.actionIcon.icon == Icons.search) {
+                  this.actionIcon = new Icon(
+                    Icons.close,
+                    color: Colors.white,
+                  );
+                  this.appBarTitle = new TextField(
+                    controller: _searchQuery,
+                    style: new TextStyle(
+                      color: Colors.white,
+                    ),
+                    decoration: new InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: new Icon(Icons.search, color: Colors.white),
+                      hintText: " Search...",
+                      hintStyle: new TextStyle(color: Colors.white),
+                    ),
+                  );
+                  _handleSearchStart();
+                } else {
+                  _handleSearchEnd();
+                }
+              });
+            },
+          ),
+          new IconButton(
+            icon: Icon(Icons.share),
+            onPressed: (){
+              Share.share("""Hey, download the *Coding List* app. https://play.google.com/store/apps/details?id=io.github.vikasgola.coding_list""");
+            },
+          )
+        ],
       ),
       body: PageStorage(
         bucket: bucket,
@@ -161,15 +260,20 @@ class _HomeState extends State<HomePage> {
   }
 }
 
-class ContestListWidget extends StatelessWidget {
+class ContestListWidget extends StatefulWidget {
   final String which;
-  final navigatorKey = GlobalKey<NavigatorState>();
   final List<Contest> contests;
   ContestListWidget(this.which, this.contests);
+  @override
+  _ContestListWidgetState createState() => _ContestListWidgetState();
+}
+
+class _ContestListWidgetState extends State<ContestListWidget> {
+  final navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
-    if (this.contests.length == 0) {
+    if (this.widget.contests.length == 0) {
       return Container(
         child: Center(
           child: Card(
@@ -177,7 +281,7 @@ class ContestListWidget extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 "No Contests!!!",
-                style: TextStyle(fontSize: 24.0),
+                style: TextStyle(fontSize: 20.0),
               ),
             ),
           ),
@@ -188,30 +292,31 @@ class ContestListWidget extends StatelessWidget {
     return Container(
       child: ListView.separated(
         physics: BouncingScrollPhysics(),
-        key: PageStorageKey(this.which),
+        key: PageStorageKey(this.widget.which),
         itemBuilder: (context, position) {
-          var start = this.contests[position].start.toString().split(" ");
-          var end = this.contests[position].end.toString().split(" ");
+          var start =
+              this.widget.contests[position].start.toString().split(" ");
+          var end = this.widget.contests[position].end.toString().split(" ");
           return GestureDetector(
               onTap: () {
-                launchURL(this.contests[position].href);
+                launchURL(this.widget.contests[position].href);
               },
               child: Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                      padding: const EdgeInsets.fromLTRB(6.0, 6.0, 6.0, 0.0),
                       child: Text(
-                        this.contests[position].event,
-                        style: TextStyle(fontSize: 24.0),
+                        this.widget.contests[position].event,
+                        style: TextStyle(fontSize: 20.0),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(6.0),
+                      padding: const EdgeInsets.all(4.0),
                       child: Text(
-                        this.contests[position].resource,
-                        style: TextStyle(fontSize: 20.0),
+                        this.widget.contests[position].resource,
+                        style: TextStyle(fontSize: 16.0),
                       ),
                     ),
                     Row(
@@ -220,11 +325,11 @@ class ContestListWidget extends StatelessWidget {
                           children: <Widget>[
                             Text(
                               start[0],
-                              style: TextStyle(fontSize: 18.0),
+                              style: TextStyle(fontSize: 14.0),
                             ),
                             Text(
                               start[1].split(".")[0],
-                              style: TextStyle(fontSize: 18.0),
+                              style: TextStyle(fontSize: 14.0),
                             )
                           ],
                         ),
@@ -232,11 +337,11 @@ class ContestListWidget extends StatelessWidget {
                           children: <Widget>[
                             Text(
                               end[0],
-                              style: TextStyle(fontSize: 18.0),
+                              style: TextStyle(fontSize: 14.0),
                             ),
                             Text(
                               end[1].split(".")[0],
-                              style: TextStyle(fontSize: 18.0),
+                              style: TextStyle(fontSize: 14.0),
                             )
                           ],
                         ),
@@ -248,11 +353,10 @@ class ContestListWidget extends StatelessWidget {
               ));
         },
         separatorBuilder: (context, position) {
-          if (position % 4 == 0) {
+          if (position % 3 == 0) {
             return Container(
-              margin: EdgeInsets.only(bottom: 20.0),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(6.0),
                 child: AdmobBanner(
                     adUnitId: getBannerAdUnitId(),
                     adSize: AdmobBannerSize.LARGE_BANNER,
@@ -284,7 +388,7 @@ class ContestListWidget extends StatelessWidget {
             return Card();
           }
         },
-        itemCount: this.contests.length,
+        itemCount: this.widget.contests.length,
       ),
     );
   }
