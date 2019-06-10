@@ -5,15 +5,7 @@ import 'package:admob_flutter/admob_flutter.dart';
 main() {
   Admob.initialize(getAppId());
   runApp(new App());
-  // FetchData fetchData = new FetchData();
-  // fetchData.initPlatformState();
-  // BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
-
-// void backgroundFetchHeadlessTask() async {
-//   print('[BackgroundFetch] Headless event received.');
-//   BackgroundFetch.finish();
-// }
 
 class App extends StatelessWidget {
   @override

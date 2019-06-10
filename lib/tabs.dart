@@ -297,7 +297,7 @@ class _ContestListWidgetState extends State<ContestListWidget> {
           var start =
               this.widget.contests[position].start.toString().split(" ");
           var end = this.widget.contests[position].end.toString().split(" ");
-          return GestureDetector(
+          return InkWell(
               onTap: () {
                 launchURL(this.widget.contests[position].href);
               },

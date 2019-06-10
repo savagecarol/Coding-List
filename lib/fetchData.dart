@@ -2,32 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-// class FetchData {
-// // Platform messages are asynchronous, so we initialize in an async method.
-// Future<void> initPlatformState() async {
-//   // Configure BackgroundFetch.
-//   BackgroundFetch.configure(BackgroundFetchConfig(
-//       minimumFetchInterval: 15,
-//       stopOnTerminate: false,
-//       enableHeadless: true
-//   ), () async {
-//     // This is the fetch-event callback.
-//     print('[BackgroundFetch] Event received');
-//     // IMPORTANT:  You must signal completion of your fetch task or the OS can punish your app
-//     // for taking too long in the background.
-//     BackgroundFetch.finish();
-//   }).then((int status) {
-//     print('[BackgroundFetch] SUCCESS: $status');
-
-//   }).catchError((e) {
-//     print('[BackgroundFetch] ERROR: $e');
-//   });
-
-//   // Optionally query the current BackgroundFetch status.
-//   // int status = await BackgroundFetch.status;
-// }
-// }
-
 Future<Contests> liveContests =
     fetchContests("mid", DateTime.now().toUtc().toString(), "-start");
 Future<Contests> completedContests =
