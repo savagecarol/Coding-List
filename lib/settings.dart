@@ -80,7 +80,7 @@ class _SettingsState extends State<Settings> {
                   """Hey, download the *Coding List* app. https://play.google.com/store/apps/details?id=io.github.vikasgola.coding_list""");
             },
             title: Text("Share"),
-            subtitle: Text("Love the app! Share the app with your friends."),
+            subtitle: Text("Love the app! Share with your friends."),
             trailing: Icon(Icons.share),
           ),
         ],

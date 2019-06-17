@@ -1,10 +1,14 @@
-<div style="text-align:center">
+<p style="text-align:center" align="center">
 
-![App Icon](assets/launcher/icon.png)
+<img src="assets/launcher/icon.png">
 
-</div>
+</p>
 
 # Coding List
+![version](https://img.shields.io/github/release/vikasgola/coding-list.svg?style=popout)
+![stars](https://img.shields.io/github/stars/vikasgola/coding-list.svg?style=popout)
+![issues](https://img.shields.io/github/issues/vikasgola/coding-list.svg?style=popout)
+
 
 Coding List is an app for coders which keeps the list of all live and upcoming coding contest in one place.
 
