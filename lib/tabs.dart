@@ -1,36 +1,10 @@
 import 'package:coding_list/fetchData.dart';
+import 'package:coding_list/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:admob_flutter/admob_flutter.dart';
-import 'dart:io';
-import 'package:share/share.dart';
-
-String getAppId() {
-  if (Platform.isIOS) {
-    return 'ca-app-pub-3940256099942544~1458002511';
-  } else if (Platform.isAndroid) {
-    return 'ca-app-pub-2643040473892428~6996314381';
-  }
-  return null;
-}
-
-String getBannerAdUnitId() {
-  if (Platform.isIOS) {
-    return 'ca-app-pub-3940256099942544/2934735716';
-  } else if (Platform.isAndroid) {
-    return 'ca-app-pub-2643040473892428/8094661681';
-  }
-  return null;
-}
-
-launchURL(String url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
-  }
-}
+import 'package:coding_list/settings.dart';
+// import 'dart:async';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class ErrorCardWidget extends StatelessWidget {
   @override
@@ -85,6 +59,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomeState extends State<HomePage> {
+  // FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   int _currentIndex = 0;
   final key = new GlobalKey<ScaffoldState>();
   final PageStorageBucket bucket = PageStorageBucket();
@@ -97,6 +72,69 @@ class _HomeState extends State<HomePage> {
   final TextEditingController _searchQuery = new TextEditingController();
   bool _isSearching = false;
   String _searchText = "";
+
+  // Future onSelectNotification(String payload) async {
+  //   if (payload != null) {
+  //     debugPrint('notification payload: ' + payload);
+  //   }
+  //   await Navigator.push(
+  //     context,
+  //     new MaterialPageRoute(builder: (context) => new HomePage()),
+  //   );
+  // }
+
+  // Future onDidReceiveLocalNotification(
+  //     int id, String title, String body, String payload) async {
+  //   showDialog(
+  //       context: context, builder: (BuildContext context) => new Text("Hello"));
+  // }
+
+  @override
+  initState() {
+    super.initState();
+    // flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    // var initializationSettingsAndroid =
+    //     AndroidInitializationSettings('@mipmap/ic_launcher');
+    // var initializationSettingsIOS = IOSInitializationSettings(
+    //     onDidReceiveLocalNotification: this.onDidReceiveLocalNotification);
+    // var initializationSettings = InitializationSettings(
+    //     initializationSettingsAndroid, initializationSettingsIOS);
+
+    // flutterLocalNotificationsPlugin
+    //     .initialize(initializationSettings,
+    //         onSelectNotification: this.onSelectNotification)
+    //     .then((onValue) async {
+    //   await _scheduleNotification();
+    // });
+  }
+
+  // Future<void> _scheduleNotification() async {
+  //   var scheduledNotificationDateTime =
+  //       DateTime.now().add(Duration(seconds: 5));
+
+  //   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  //       'your other channel id',
+  //       'your other channel name',
+  //       'your other channel description',
+  //       largeIconBitmapSource: BitmapSource.Drawable,
+  //       enableLights: true,
+  //       color: const Color.fromARGB(255, 255, 0, 0),
+  //       ledColor: const Color.fromARGB(255, 255, 0, 0),
+  //       ledOnMs: 1000,
+  //       importance: Importance.Max,
+  //       priority: Priority.High,
+  //       ledOffMs: 500);
+  //   var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+  //   var platformChannelSpecifics = NotificationDetails(
+  //       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+  //   await flutterLocalNotificationsPlugin.schedule(
+  //       0,
+  //       'scheduled title',
+  //       'scheduled body',
+  //       scheduledNotificationDateTime,
+  //       platformChannelSpecifics);
+  // }
 
   void onTabTapped(int index) {
     setState(() {
@@ -122,15 +160,14 @@ class _HomeState extends State<HomePage> {
     });
   }
 
-  _HomeState(){
+  _HomeState() {
     _searchQuery.addListener(() {
       if (_searchQuery.text.isEmpty) {
         setState(() {
           _isSearching = false;
           _searchText = "";
         });
-      }
-      else {
+      } else {
         setState(() {
           _isSearching = true;
           _searchText = _searchQuery.text;
@@ -139,14 +176,21 @@ class _HomeState extends State<HomePage> {
     });
   }
 
-  List<Contest> getSearchContests(List<Contest> allcontests){
-    if(_searchText.isEmpty){
+  List<Contest> getSearchContests(List<Contest> allcontests) {
+    if (_searchText.isEmpty) {
       return allcontests;
     }
 
     List<Contest> _list = [];
     for (var i = 0; i < allcontests.length; i++) {
-      if(allcontests[i].event.toLowerCase().contains(_searchText.toLowerCase()) || allcontests[i].resource.toLowerCase().contains(_searchText.toLowerCase())){
+      if (allcontests[i]
+              .event
+              .toLowerCase()
+              .contains(_searchText.toLowerCase()) ||
+          allcontests[i]
+              .resource
+              .toLowerCase()
+              .contains(_searchText.toLowerCase())) {
         _list.add(allcontests[i]);
       }
     }
@@ -161,7 +205,11 @@ class _HomeState extends State<HomePage> {
         future: liveContests,
         builder: (contests, snapshot) {
           if (snapshot.hasData) {
-            return ContestListWidget("live", _isSearching ? getSearchContests(snapshot.data.contests) : snapshot.data.contests);
+            return ContestListWidget(
+                "live",
+                _isSearching
+                    ? getSearchContests(snapshot.data.contests)
+                    : snapshot.data.contests);
           } else if (snapshot.hasError) {
             return ErrorCardWidget();
           }
@@ -172,7 +220,11 @@ class _HomeState extends State<HomePage> {
         future: upcomingContests,
         builder: (contests, snapshot) {
           if (snapshot.hasData) {
-            return ContestListWidget("upcoming", _isSearching ? getSearchContests(snapshot.data.contests) : snapshot.data.contests);
+            return ContestListWidget(
+                "upcoming",
+                _isSearching
+                    ? getSearchContests(snapshot.data.contests)
+                    : snapshot.data.contests);
           } else if (snapshot.hasError) {
             return ErrorCardWidget();
           }
@@ -183,7 +235,11 @@ class _HomeState extends State<HomePage> {
         future: completedContests,
         builder: (contests, snapshot) {
           if (snapshot.hasData) {
-            return ContestListWidget("completed", _isSearching ? getSearchContests(snapshot.data.contests) : snapshot.data.contests);
+            return ContestListWidget(
+                "completed",
+                _isSearching
+                    ? getSearchContests(snapshot.data.contests)
+                    : snapshot.data.contests);
           } else if (snapshot.hasError) {
             return ErrorCardWidget();
           }
@@ -196,7 +252,6 @@ class _HomeState extends State<HomePage> {
       appBar: AppBar(
         title: this.appBarTitle,
         key: this.key,
-        // centerTitle: true,
         actions: <Widget>[
           new IconButton(
             icon: this.actionIcon,
@@ -227,11 +282,14 @@ class _HomeState extends State<HomePage> {
             },
           ),
           new IconButton(
-            icon: Icon(Icons.share),
-            onPressed: (){
-              Share.share("""Hey, download the *Coding List* app. https://play.google.com/store/apps/details?id=io.github.vikasgola.coding_list""");
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => Settings()));
             },
-          )
+          ),
         ],
       ),
       body: PageStorage(
@@ -255,140 +313,6 @@ class _HomeState extends State<HomePage> {
             title: Text('Completed'),
           )
         ],
-      ),
-    );
-  }
-}
-
-class ContestListWidget extends StatefulWidget {
-  final String which;
-  final List<Contest> contests;
-  ContestListWidget(this.which, this.contests);
-  @override
-  _ContestListWidgetState createState() => _ContestListWidgetState();
-}
-
-class _ContestListWidgetState extends State<ContestListWidget> {
-  final navigatorKey = GlobalKey<NavigatorState>();
-
-  @override
-  Widget build(BuildContext context) {
-    if (this.widget.contests.length == 0) {
-      return Container(
-        child: Center(
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "No Contests!!!",
-                style: TextStyle(fontSize: 20.0),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      child: ListView.separated(
-        physics: BouncingScrollPhysics(),
-        key: PageStorageKey(this.widget.which),
-        itemBuilder: (context, position) {
-          var start =
-              this.widget.contests[position].start.toString().split(" ");
-          var end = this.widget.contests[position].end.toString().split(" ");
-          return InkWell(
-              onTap: () {
-                launchURL(this.widget.contests[position].href);
-              },
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(6.0, 6.0, 6.0, 0.0),
-                      child: Text(
-                        this.widget.contests[position].event,
-                        style: TextStyle(fontSize: 20.0),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Text(
-                        this.widget.contests[position].resource,
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Text(
-                              start[0],
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            Text(
-                              start[1].split(".")[0],
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          ],
-                        ),
-                        Column(
-                          children: <Widget>[
-                            Text(
-                              end[0],
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            Text(
-                              end[1].split(".")[0],
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          ],
-                        ),
-                      ],
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    )
-                  ]),
-                ),
-              ));
-        },
-        separatorBuilder: (context, position) {
-          if (position % 3 == 0) {
-            return Container(
-              child: Padding(
-                padding: const EdgeInsets.all(6.0),
-                child: AdmobBanner(
-                    adUnitId: getBannerAdUnitId(),
-                    adSize: AdmobBannerSize.LARGE_BANNER,
-                    listener: (AdmobAdEvent event, Map<String, dynamic> args) {
-                      switch (event) {
-                        case AdmobAdEvent.loaded:
-                          print('Admob banner loaded!');
-                          break;
-
-                        case AdmobAdEvent.opened:
-                          print('Admob banner opened!');
-                          break;
-
-                        case AdmobAdEvent.closed:
-                          print('Admob banner closed!');
-                          break;
-
-                        case AdmobAdEvent.failedToLoad:
-                          print(
-                              'Admob banner failed to load. Error code: ${args['errorCode']}');
-                          break;
-                        default:
-                          break;
-                      }
-                    }),
-              ),
-            );
-          } else {
-            return Card();
-          }
-        },
-        itemCount: this.widget.contests.length,
       ),
     );
   }
