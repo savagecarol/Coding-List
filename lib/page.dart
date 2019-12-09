@@ -1,9 +1,6 @@
-
-import 'dart:io';
 import 'package:coding_list/fetchData.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:admob_flutter/admob_flutter.dart';
 
 launchURL(String url) async {
   if (await canLaunch(url)) {
@@ -13,14 +10,6 @@ launchURL(String url) async {
   }
 }
 
-String getBannerAdUnitId() {
-  if (Platform.isIOS) {
-    return 'ca-app-pub-3940256099942544/2934735716';
-  } else if (Platform.isAndroid) {
-    return 'ca-app-pub-2643040473892428/8094661681';
-  }
-  return null;
-}
 
 class ContestListWidget extends StatefulWidget {
   final String which;
@@ -52,7 +41,7 @@ class _ContestListWidgetState extends State<ContestListWidget> {
     }
 
     return Container(
-      child: ListView.separated(
+      child: ListView.builder(
         physics: BouncingScrollPhysics(),
         key: PageStorageKey(this.widget.which),
         itemBuilder: (context, position) {
@@ -86,6 +75,11 @@ class _ContestListWidgetState extends State<ContestListWidget> {
                         Column(
                           children: <Widget>[
                             Text(
+                              "Start",
+                              style: TextStyle(
+                                  fontSize: 14.0, fontWeight: FontWeight.w600),
+                            ),
+                            Text(
                               start[0],
                               style: TextStyle(fontSize: 14.0),
                             ),
@@ -98,6 +92,11 @@ class _ContestListWidgetState extends State<ContestListWidget> {
                         Column(
                           children: <Widget>[
                             Text(
+                              "End",
+                              style: TextStyle(
+                                  fontSize: 14.0, fontWeight: FontWeight.w600),
+                            ),
+                            Text(
                               end[0],
                               style: TextStyle(fontSize: 14.0),
                             ),
@@ -109,41 +108,11 @@ class _ContestListWidgetState extends State<ContestListWidget> {
                         ),
                       ],
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    )
+                    ),
                   ]),
                 ),
               ));
-        },
-        separatorBuilder: (context, position) {
-          if (position % 3 == 0) {
-            return Container(
-              child: Padding(
-                padding: const EdgeInsets.all(6.0),
-                child: AdmobBanner(
-                    adUnitId: getBannerAdUnitId(),
-                    adSize: AdmobBannerSize.LARGE_BANNER,
-                    listener: (AdmobAdEvent event, Map<String, dynamic> args) {
-                      switch (event) {
-                        case AdmobAdEvent.loaded:
-                          break;
-                        case AdmobAdEvent.opened:
-                          break;
-                        case AdmobAdEvent.closed:
-                          break;
-                        case AdmobAdEvent.failedToLoad:
-                          print(
-                              'Admob banner failed to load. Error code: ${args['errorCode']}');
-                          break;
-                        default:
-                          break;
-                      }
-                    }),
-              ),
-            );
-          } else {
-            return Card();
-          }
-        },
+        },       
         itemCount: this.widget.contests.length,
       ),
     );

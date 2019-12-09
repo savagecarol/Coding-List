@@ -3,8 +3,7 @@ import 'package:coding_list/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:coding_list/settings.dart';
-// import 'dart:async';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:coding_list/notification.dart';
 
 class ErrorCardWidget extends StatelessWidget {
   @override
@@ -52,14 +51,17 @@ class ProgressBarWidget extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
+  final String payload;
+  final List<int> visible;
+  HomePage(this.payload, this.visible);
+
   @override
-  State<StatefulWidget> createState() {
-    return _HomeState();
+  _HomeState createState(){
+    return new _HomeState(this.payload);
   }
 }
 
 class _HomeState extends State<HomePage> {
-  // FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   int _currentIndex = 0;
   final key = new GlobalKey<ScaffoldState>();
   final PageStorageBucket bucket = PageStorageBucket();
@@ -73,68 +75,23 @@ class _HomeState extends State<HomePage> {
   bool _isSearching = false;
   String _searchText = "";
 
-  // Future onSelectNotification(String payload) async {
-  //   if (payload != null) {
-  //     debugPrint('notification payload: ' + payload);
-  //   }
-  //   await Navigator.push(
-  //     context,
-  //     new MaterialPageRoute(builder: (context) => new HomePage()),
-  //   );
-  // }
-
-  // Future onDidReceiveLocalNotification(
-  //     int id, String title, String body, String payload) async {
-  //   showDialog(
-  //       context: context, builder: (BuildContext context) => new Text("Hello"));
-  // }
+  Map<int, String> list = {
+    1: 'Codeforces',
+    2: 'Codechef',
+    3: 'Hackerearth',
+    4: 'Hackerrank',
+    5: 'Leetcode',
+    6: 'Kaggle',
+    7: 'ctftime',
+    8: 'Topcoder',
+    0: 'Others',
+  };
 
   @override
   initState() {
     super.initState();
-    // flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-    // var initializationSettingsAndroid =
-    //     AndroidInitializationSettings('@mipmap/ic_launcher');
-    // var initializationSettingsIOS = IOSInitializationSettings(
-    //     onDidReceiveLocalNotification: this.onDidReceiveLocalNotification);
-    // var initializationSettings = InitializationSettings(
-    //     initializationSettingsAndroid, initializationSettingsIOS);
-
-    // flutterLocalNotificationsPlugin
-    //     .initialize(initializationSettings,
-    //         onSelectNotification: this.onSelectNotification)
-    //     .then((onValue) async {
-    //   await _scheduleNotification();
-    // });
+    // fetchSettings();
   }
-
-  // Future<void> _scheduleNotification() async {
-  //   var scheduledNotificationDateTime =
-  //       DateTime.now().add(Duration(seconds: 5));
-
-  //   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-  //       'your other channel id',
-  //       'your other channel name',
-  //       'your other channel description',
-  //       largeIconBitmapSource: BitmapSource.Drawable,
-  //       enableLights: true,
-  //       color: const Color.fromARGB(255, 255, 0, 0),
-  //       ledColor: const Color.fromARGB(255, 255, 0, 0),
-  //       ledOnMs: 1000,
-  //       importance: Importance.Max,
-  //       priority: Priority.High,
-  //       ledOffMs: 500);
-  //   var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-  //   var platformChannelSpecifics = NotificationDetails(
-  //       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-  //   await flutterLocalNotificationsPlugin.schedule(
-  //       0,
-  //       'scheduled title',
-  //       'scheduled body',
-  //       scheduledNotificationDateTime,
-  //       platformChannelSpecifics);
-  // }
 
   void onTabTapped(int index) {
     setState(() {
@@ -160,17 +117,18 @@ class _HomeState extends State<HomePage> {
     });
   }
 
-  _HomeState() {
+  _HomeState(String payload) {
+    if (payload != "") launchURL(payload);
     _searchQuery.addListener(() {
       if (_searchQuery.text.isEmpty) {
         setState(() {
-          _isSearching = false;
-          _searchText = "";
+          this._isSearching = false;
+          this._searchText = "";
         });
       } else {
         setState(() {
-          _isSearching = true;
-          _searchText = _searchQuery.text;
+          this._isSearching = true;
+          this._searchText = _searchQuery.text;
         });
       }
     });
@@ -198,6 +156,36 @@ class _HomeState extends State<HomePage> {
     return _list;
   }
 
+  bool _shouldVisible(Contest contest) {
+    bool shouldAdd = false;
+
+    widget.visible.forEach((i) {
+      if (contest.href.contains(this.list[i].toLowerCase())) {
+        shouldAdd = true;
+      }
+    });
+    if (!shouldAdd && widget.visible.contains(0)) {
+      shouldAdd = true;
+      this.list.forEach((i, name) {
+        if (contest.href.contains(name.toLowerCase())) {
+          shouldAdd = false;
+        }
+      });
+    }
+    return shouldAdd;
+  }
+
+  List<Contest> felterContests(List<Contest> contests) {
+    List<Contest> temp = [];
+
+    contests.forEach((contest) {
+      if (_shouldVisible(contest)) {
+        temp.add(contest);
+      }
+    });
+    return temp;
+  }
+
   @override
   Widget build(BuildContext context) {
     _children = [
@@ -205,11 +193,10 @@ class _HomeState extends State<HomePage> {
         future: liveContests,
         builder: (contests, snapshot) {
           if (snapshot.hasData) {
+            List<Contest> contests = snapshot.data.contests;
+            List<Contest> filtered = felterContests(contests);
             return ContestListWidget(
-                "live",
-                _isSearching
-                    ? getSearchContests(snapshot.data.contests)
-                    : snapshot.data.contests);
+                "live", _isSearching ? getSearchContests(filtered) : filtered);
           } else if (snapshot.hasError) {
             return ErrorCardWidget();
           }
@@ -219,12 +206,12 @@ class _HomeState extends State<HomePage> {
       FutureBuilder<Contests>(
         future: upcomingContests,
         builder: (contests, snapshot) {
+          // initNotifications(snapshot.data.contests, context);
           if (snapshot.hasData) {
-            return ContestListWidget(
-                "upcoming",
-                _isSearching
-                    ? getSearchContests(snapshot.data.contests)
-                    : snapshot.data.contests);
+            List<Contest> contests = snapshot.data.contests;
+            List<Contest> filtered = felterContests(contests);
+            return ContestListWidget("upcoming",
+                _isSearching ? getSearchContests(filtered) : filtered);
           } else if (snapshot.hasError) {
             return ErrorCardWidget();
           }
@@ -235,11 +222,10 @@ class _HomeState extends State<HomePage> {
         future: completedContests,
         builder: (contests, snapshot) {
           if (snapshot.hasData) {
-            return ContestListWidget(
-                "completed",
-                _isSearching
-                    ? getSearchContests(snapshot.data.contests)
-                    : snapshot.data.contests);
+            List<Contest> contests = snapshot.data.contests;
+            List<Contest> filtered = felterContests(contests);
+            return ContestListWidget("completed",
+                _isSearching ? getSearchContests(filtered) : filtered);
           } else if (snapshot.hasError) {
             return ErrorCardWidget();
           }

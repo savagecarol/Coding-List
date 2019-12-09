@@ -26,8 +26,6 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-2643040473892428~6996314381</string>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
 	<key>io.flutter.embedded_views_preview</key>

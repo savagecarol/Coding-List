@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:coding_list/tabs.dart';
-import 'package:admob_flutter/admob_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> getTheme() async {
@@ -9,36 +7,69 @@ Future<bool> getTheme() async {
   return prefs.getBool("isDark") ?? false;
 }
 
+Future<List<int>> getVisibleSettings() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final out = prefs.getStringList("visible-settings") ??
+      ["0", "1", "2", "3", "4", "5", "6", "7", "8"];
+  return out.map((i) => int.parse(i)).toList();
+}
 
-String getAppId() {
-  if (Platform.isIOS) {
-    return 'ca-app-pub-3940256099942544~1458002511';
-  } else if (Platform.isAndroid) {
-    return 'ca-app-pub-2643040473892428~6996314381';
+main() {
+  runApp(new RestartWidget());
+}
+
+class RestartWidget extends StatefulWidget {
+  final Widget child;
+
+  RestartWidget({this.child});
+
+  static restartApp(BuildContext context) {
+    final _RestartWidgetState state =
+        context.ancestorStateOfType(const TypeMatcher<_RestartWidgetState>());
+    state.restartApp();
   }
-  return null;
+
+  @override
+  _RestartWidgetState createState() => new _RestartWidgetState();
 }
 
-bool isDarkTheme;
+class _RestartWidgetState extends State<RestartWidget> {
+  Key key = new UniqueKey();
+  bool isDarkTheme = false;
+  List<int> visible = [];
 
-main() async {
-  isDarkTheme = await getTheme();
-  print(isDarkTheme);
-  Admob.initialize(getAppId());
-  runApp(new App());
-}
+  Future<void> updateDetails() async {
+    bool temp = await getTheme();
+    List<int> temp2 = await getVisibleSettings();
 
-class App extends StatelessWidget {
+    setState(() {
+      this.isDarkTheme = temp;
+      this.visible = temp2;
+    });
+  }
+
+  @override
+  initState() {
+    super.initState();
+    updateDetails();
+  }
+
+  void restartApp() {
+    updateDetails();
+    this.setState(() {
+      key = new UniqueKey();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return new MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Coding List',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: isDarkTheme ? Brightness.dark : Brightness.light 
-      ),
-      home: HomePage(),
+          primarySwatch: Colors.blue,
+          brightness: this.isDarkTheme ? Brightness.dark : Brightness.light),
+      home: new HomePage("", this.visible),
     );
   }
 }
