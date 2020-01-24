@@ -84,6 +84,7 @@ class _HomeState extends State<HomePage> {
     6: 'Kaggle',
     7: 'ctftime',
     8: 'Topcoder',
+    9: 'Atcoder',
     0: 'Others',
   };
 
@@ -284,6 +285,7 @@ class _HomeState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
+        selectedItemColor: Colors.blue,
         currentIndex: _currentIndex,
         items: [
           new BottomNavigationBarItem(

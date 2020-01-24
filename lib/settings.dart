@@ -33,7 +33,7 @@ Future<void> setTheme(bool isDark) async {
 Future<List<int>> getVisibleSettings() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final out = prefs.getStringList("visible-settings") ??
-      ["0","1", "2", "3", "4", "5", "6", "7", "8"];
+      ["0","1", "2", "3", "4", "5", "6", "7", "8", "9"];
   return out.map((i) => int.parse(i)).toList();
 }
 
@@ -61,6 +61,7 @@ class _SettingsState extends State<Settings> {
     MultiSelectDialogItem(6, 'Kaggle'),
     MultiSelectDialogItem(7, 'ctftime'),
     MultiSelectDialogItem(8, 'Topcoder'),
+    MultiSelectDialogItem(9, 'Atcoder'),
     MultiSelectDialogItem(0, 'Others'),
   ];
   // List<int> notify = [];

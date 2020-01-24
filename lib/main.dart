@@ -10,7 +10,7 @@ Future<bool> getTheme() async {
 Future<List<int>> getVisibleSettings() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final out = prefs.getStringList("visible-settings") ??
-      ["0", "1", "2", "3", "4", "5", "6", "7", "8"];
+      ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
   return out.map((i) => int.parse(i)).toList();
 }
 
@@ -25,7 +25,7 @@ class RestartWidget extends StatefulWidget {
 
   static restartApp(BuildContext context) {
     final _RestartWidgetState state =
-        context.ancestorStateOfType(const TypeMatcher<_RestartWidgetState>());
+        context.findAncestorStateOfType<_RestartWidgetState>();
     state.restartApp();
   }
 
@@ -68,7 +68,8 @@ class _RestartWidgetState extends State<RestartWidget> {
       title: 'Coding List',
       theme: ThemeData(
           primarySwatch: Colors.blue,
-          brightness: this.isDarkTheme ? Brightness.dark : Brightness.light),
+          brightness: this.isDarkTheme ? Brightness.dark : Brightness.light,
+          toggleableActiveColor: Colors.blue),
       home: new HomePage("", this.visible),
     );
   }
