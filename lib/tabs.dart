@@ -119,7 +119,7 @@ class _HomeState extends State<HomePage> {
   }
 
   _HomeState(String payload) {
-    if (payload != "") launchURL(payload);
+    // if (payload != "") launchURL(payload);
     _searchQuery.addListener(() {
       if (_searchQuery.text.isEmpty) {
         setState(() {

@@ -1,15 +1,11 @@
+import 'package:coding_list/contest.dart';
 import 'package:coding_list/fetchData.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-launchURL(String url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
-  }
+openContestPage(Contest contest, BuildContext context) {
+  Navigator.push(context,
+      MaterialPageRoute(builder: (BuildContext context) => ContestPage(contest)));
 }
-
 
 class ContestListWidget extends StatefulWidget {
   final String which;
@@ -50,7 +46,7 @@ class _ContestListWidgetState extends State<ContestListWidget> {
           var end = this.widget.contests[position].end.toString().split(" ");
           return InkWell(
               onTap: () {
-                launchURL(this.widget.contests[position].href);
+                openContestPage(this.widget.contests[position], context);
               },
               child: Card(
                 child: Padding(
@@ -112,7 +108,7 @@ class _ContestListWidgetState extends State<ContestListWidget> {
                   ]),
                 ),
               ));
-        },       
+        },
         itemCount: this.widget.contests.length,
       ),
     );
