@@ -1,8 +1,10 @@
 import 'package:coding_list/fetchData.dart';
+// import 'package:coding_list/problems.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:quiver/async.dart';
+import 'package:add_2_calendar/add_2_calendar.dart';
 
 launchURL(String url) async {
   if (await canLaunch(url)) {
@@ -34,6 +36,7 @@ class _ContestPage extends State<ContestPage> {
 
   @override
   Widget build(BuildContext context) {
+    var eventaddoption = false;
     if (this.widget.contest.start.isAfter(new DateTime.now())) {
       timerText = "Contest starting in";
       upcomingContestTimer = new CountdownTimer(
@@ -58,6 +61,7 @@ class _ContestPage extends State<ContestPage> {
       sub.onDone(() {
         sub.cancel();
       });
+      eventaddoption = true;
     } else if (this.widget.contest.end.isBefore(new DateTime.now())) {
       timerText = "Contest ended";
     } else {
@@ -130,6 +134,14 @@ class _ContestPage extends State<ContestPage> {
         duration += " seconds ";
       }
     }
+    var nam = this.widget.contest.resource.toLowerCase().split(".")[0];
+    final Event event = Event(
+      title: this.widget.contest.event,
+      description: this.widget.contest.resource,
+      location: this.widget.contest.href,
+      startDate: this.widget.contest.start,
+      endDate: this.widget.contest.end,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -144,129 +156,192 @@ class _ContestPage extends State<ContestPage> {
         ],
       ),
       body: Container(
+        padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 2.0),
         child: Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 2.0),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Text(
-                      timerText,
-                      textAlign: TextAlign.center,
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Text(
+                    timerText,
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    remainingTime,
+                    style: TextStyle(
+                      fontSize: 26.0,
                     ),
-                    Text(
-                      remainingTime,
-                      style: TextStyle(
-                        fontSize: 26.0,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 2.0),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Text(
-                      "Duration",
-                      textAlign: TextAlign.center,
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Text(
+                    "Duration",
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    duration,
+                    style: TextStyle(
+                      fontSize: 26.0,
                     ),
-                    Text(
-                      duration,
-                      style: TextStyle(
-                        fontSize: 26.0,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 2.0),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Text(
-                      "Platform",
-                      textAlign: TextAlign.center,
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Text(
+                    "Platform",
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    this.widget.contest.resource,
+                    style: TextStyle(
+                      fontSize: 26.0,
                     ),
-                    Text(
-                      this.widget.contest.resource,
-                      style: TextStyle(
-                        fontSize: 26.0,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Padding(padding: const EdgeInsets.all(2.0)),
+                  Image.asset(
+                    'assets/icons/$nam.${[
+                      "yukicoder",
+                      "kaggle",
+                      "projecteuler",
+                      "codechef",
+                      "e-olymp",
+                      "opencup"
+                    ].contains(nam) ? "ico" : "png"}',
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container();
+                    },
+                    width: 48,
+                    height: 48,
+                  )
+                ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 2.0),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          "Starts at",
-                          style: TextStyle(
-                              fontSize: 14.0, fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          start[0],
-                          style: TextStyle(fontSize: 18.0),
-                        ),
-                        Text(
-                          start[1].split(".")[0],
-                          style: TextStyle(fontSize: 18.0),
-                        )
-                      ],
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          "Ends at",
-                          style: TextStyle(
-                              fontSize: 14.0, fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          end[0],
-                          style: TextStyle(fontSize: 18.0),
-                        ),
-                        Text(
-                          end[1].split(".")[0],
-                          style: TextStyle(fontSize: 18.0),
-                        )
-                      ],
-                    ),
-                  ],
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                ),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Text(
+                        "Starts at",
+                        style: TextStyle(
+                            fontSize: 14.0, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        start[0],
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                      Text(
+                        start[1].split(".")[0],
+                        style: TextStyle(fontSize: 18.0),
+                      )
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Text(
+                        "Ends at",
+                        style: TextStyle(
+                            fontSize: 14.0, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        end[0],
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                      Text(
+                        end[1].split(".")[0],
+                        style: TextStyle(fontSize: 18.0),
+                      )
+                    ],
+                  ),
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
               ),
             ),
-          )
+          ),
+          // (
+          //   timerText.contains("ended") ?
+          //     GestureDetector(
+          //     onTap: ()=>{
+          //       this.widget.contest.resource.contains(RegExp(r"(codeforces|ctftime)")) ?
+          //         Navigator.push(
+          //           context,
+          //           MaterialPageRoute(
+          //             builder: (BuildContext context) => ProblemsPage(this.widget.contest)
+          //           )
+          //         )
+          //       :
+          //         print(["not implemented", this.widget.contest.href])
+          //     },
+          //     child: Card(
+          //       child: Padding(
+          //         padding: const EdgeInsets.all(18.0),
+          //         child: Column(
+          //           crossAxisAlignment: CrossAxisAlignment.stretch,
+          //           mainAxisSize: MainAxisSize.max,
+          //           children: <Widget>[
+          //             Text(
+          //               "Problems & Solutions",
+          //               style: TextStyle(
+          //                 fontSize: 26.0,
+          //               ),
+          //               textAlign: TextAlign.center,
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   )
+          // :
+          //   Container()
+          // )
+          (eventaddoption
+              ? GestureDetector(
+                  onTap: () => Add2Calendar.addEvent2Cal(event),
+                  child: Card(
+                    color: Colors.blue,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Text(
+                            "Add to Calendar",
+                            style:
+                                TextStyle(fontSize: 22.0, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ))
+              : Container()),
         ]),
       ),
     );

@@ -4,13 +4,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> getTheme() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getBool("isDark") ?? false;
+  return prefs.getBool("isDark") ?? ThemeMode.system == ThemeMode.dark;
 }
 
 Future<List<int>> getVisibleSettings() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final out = prefs.getStringList("visible-settings") ??
-      ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13"
+      ];
   return out.map((i) => int.parse(i)).toList();
 }
 
@@ -35,7 +50,7 @@ class RestartWidget extends StatefulWidget {
 
 class _RestartWidgetState extends State<RestartWidget> {
   Key key = new UniqueKey();
-  bool isDarkTheme = false;
+  bool isDarkTheme = ThemeMode.system == ThemeMode.dark;
   List<int> visible = [];
 
   Future<void> updateDetails() async {
@@ -66,10 +81,9 @@ class _RestartWidgetState extends State<RestartWidget> {
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Coding List',
-      theme: ThemeData(
-          primarySwatch: Colors.blue,
-          brightness: this.isDarkTheme ? Brightness.dark : Brightness.light,
-          toggleableActiveColor: Colors.blue),
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: this.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       home: new HomePage("", this.visible),
     );
   }

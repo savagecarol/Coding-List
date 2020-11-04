@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share/share.dart';
 import 'package:coding_list/multiselect.dart';
 import 'package:coding_list/main.dart';
-
+import 'package:buy_me_a_coffee_widget/buy_me_a_coffee_widget.dart';
 
 Future<bool> getTheme() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -17,23 +17,25 @@ Future<void> setTheme(bool isDark) async {
   prefs.setBool("isDark", isDark);
 }
 
-// Future<List<int>> getNotificationSettings() async {
-//   final SharedPreferences prefs = await SharedPreferences.getInstance();
-//   final out = prefs.getStringList("notification-settings") ??
-//       ["0","1", "2", "3", "4", "5", "6", "7", "8"];
-//   return out.map((i) => int.parse(i)).toList();
-// }
-
-// Future<void> setNotificationSettings(List<int> list) async {
-//   final SharedPreferences prefs = await SharedPreferences.getInstance();
-//   prefs.setStringList(
-//       "notification-settings", list.map((i) => i.toString()).toList());
-// }
-
 Future<List<int>> getVisibleSettings() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final out = prefs.getStringList("visible-settings") ??
-      ["0","1", "2", "3", "4", "5", "6", "7", "8", "9"];
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13"
+      ];
   return out.map((i) => int.parse(i)).toList();
 }
 
@@ -42,7 +44,6 @@ Future<void> setVisibleSettings(List<int> list) async {
   prefs.setStringList(
       "visible-settings", list.map((i) => i.toString()).toList());
 }
-
 
 class Settings extends StatefulWidget {
   @override
@@ -62,9 +63,12 @@ class _SettingsState extends State<Settings> {
     MultiSelectDialogItem(7, 'ctftime'),
     MultiSelectDialogItem(8, 'Topcoder'),
     MultiSelectDialogItem(9, 'Atcoder'),
+    MultiSelectDialogItem(10, 'Codinggame'),
+    MultiSelectDialogItem(11, 'Binarysearch'),
+    MultiSelectDialogItem(12, 'Projecteuler'),
+    MultiSelectDialogItem(13, 'Spoj'),
     MultiSelectDialogItem(0, 'Others'),
   ];
-  // List<int> notify = [];
   List<int> visible = [];
 
   @override
@@ -111,28 +115,6 @@ class _SettingsState extends State<Settings> {
               value: this.isDark,
             ),
           ),
-          // ListTile(
-          //   onTap: () async {
-          //     final selectedValues = await showDialog<Set<int>>(
-          //       context: context,
-          //       builder: (BuildContext context) {
-          //         return MultiSelectDialog(
-          //           items: items,
-          //           initialSelectedValues: this.notify.toSet(),
-          //         );
-          //       },
-          //     );
-          //     setState(() {
-          //       if (selectedValues != null){
-          //         this.notify = selectedValues.toList();
-          //         setNotificationSettings(this.notify);
-          //       }
-          //     });
-          //   },
-          //   title: Text("Notifications"),
-          //   subtitle: Text("Get notifications of contests."),
-          //   trailing: Icon(Icons.notifications),
-          // ),
           ListTile(
             onTap: () async {
               final selectedValues = await showDialog<Set<int>>(
@@ -146,7 +128,7 @@ class _SettingsState extends State<Settings> {
                 },
               );
               setState(() {
-                if (selectedValues != null){
+                if (selectedValues != null) {
                   this.visible = selectedValues.toList();
                   setVisibleSettings(this.visible);
                   RestartWidget.restartApp(context);
@@ -165,6 +147,13 @@ class _SettingsState extends State<Settings> {
             title: Text("Share"),
             subtitle: Text("Love the app! Share with your friends."),
             trailing: Icon(Icons.share),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 30, right: 30),
+            child: BuyMeACoffeeWidget(
+              sponsorID: "vikasgola",
+              theme: OrangeTheme(),
+            ),
           ),
         ],
       )),

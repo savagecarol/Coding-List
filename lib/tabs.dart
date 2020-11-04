@@ -6,6 +6,9 @@ import 'package:coding_list/settings.dart';
 // import 'package:coding_list/notification.dart';
 
 class ErrorCardWidget extends StatelessWidget {
+  final String text;
+  ErrorCardWidget(this.text);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -18,7 +21,7 @@ class ErrorCardWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                "No internet!!! Try restarting App.",
+                this.text,
                 style: TextStyle(fontSize: 20.0),
               ),
             ),
@@ -30,20 +33,30 @@ class ErrorCardWidget extends StatelessWidget {
 }
 
 class ProgressBarWidget extends StatelessWidget {
+  final String text;
+  ProgressBarWidget(this.text);
+
   @override
   Widget build(BuildContext context) {
-    return new Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: new Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            new CircularProgressIndicator(),
-            Container(
-              child: new Text("Loading..."),
-              margin: EdgeInsets.only(left: 16.0),
+    return Container(
+      child: Center(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  child: new Text(
+                    this.text,
+                    style: new TextStyle(fontSize: 18.0),
+                  ),
+                  margin: EdgeInsets.all(16.0),
+                ),
+                new CircularProgressIndicator(),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -56,7 +69,7 @@ class HomePage extends StatefulWidget {
   HomePage(this.payload, this.visible);
 
   @override
-  _HomeState createState(){
+  _HomeState createState() {
     return new _HomeState(this.payload);
   }
 }
@@ -86,6 +99,10 @@ class _HomeState extends State<HomePage> {
     8: 'Topcoder',
     9: 'Atcoder',
     0: 'Others',
+    10: 'Codinggame',
+    11: 'Binarysearch',
+    12: 'Projecteuler',
+    13: 'Spoj'
   };
 
   @override
@@ -176,7 +193,7 @@ class _HomeState extends State<HomePage> {
     return shouldAdd;
   }
 
-  List<Contest> felterContests(List<Contest> contests) {
+  List<Contest> filterContests(List<Contest> contests) {
     List<Contest> temp = [];
 
     contests.forEach((contest) {
@@ -195,13 +212,13 @@ class _HomeState extends State<HomePage> {
         builder: (contests, snapshot) {
           if (snapshot.hasData) {
             List<Contest> contests = snapshot.data.contests;
-            List<Contest> filtered = felterContests(contests);
+            List<Contest> filtered = filterContests(contests);
             return ContestListWidget(
                 "live", _isSearching ? getSearchContests(filtered) : filtered);
           } else if (snapshot.hasError) {
-            return ErrorCardWidget();
+            return ErrorCardWidget("No internet!!! Try restarting App.");
           }
-          return ProgressBarWidget();
+          return ProgressBarWidget("Fetching Contests. :-)");
         },
       ),
       FutureBuilder<Contests>(
@@ -210,13 +227,13 @@ class _HomeState extends State<HomePage> {
           // initNotifications(snapshot.data.contests, context);
           if (snapshot.hasData) {
             List<Contest> contests = snapshot.data.contests;
-            List<Contest> filtered = felterContests(contests);
+            List<Contest> filtered = filterContests(contests);
             return ContestListWidget("upcoming",
                 _isSearching ? getSearchContests(filtered) : filtered);
           } else if (snapshot.hasError) {
-            return ErrorCardWidget();
+            return ErrorCardWidget("No internet!!! Try restarting App.");
           }
-          return ProgressBarWidget();
+          return ProgressBarWidget("Fetching Contests. :-)");
         },
       ),
       FutureBuilder<Contests>(
@@ -224,13 +241,13 @@ class _HomeState extends State<HomePage> {
         builder: (contests, snapshot) {
           if (snapshot.hasData) {
             List<Contest> contests = snapshot.data.contests;
-            List<Contest> filtered = felterContests(contests);
+            List<Contest> filtered = filterContests(contests);
             return ContestListWidget("completed",
                 _isSearching ? getSearchContests(filtered) : filtered);
           } else if (snapshot.hasError) {
-            return ErrorCardWidget();
+            return ErrorCardWidget("No internet!!! Try restarting App.");
           }
-          return ProgressBarWidget();
+          return ProgressBarWidget("Fetching Contests. :-)");
         },
       )
     ];

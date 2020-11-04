@@ -49,7 +49,16 @@ class Contests {
   Contests.fromJSON(Map<String, dynamic> json) {
     for (var contestjson in json['objects']) {
       var contest = Contest.fromJSON(contestjson);
-      this.contests.add(contest);
+      if (![
+        "neerc.ifmo.ru",
+        "neerc.ifmo.ru/school",
+        "yandex.ru",
+        "contest.yandex.ru",
+        "contest.yandex.ru/CYF",
+        "acmp.ru",
+        "acmu.ru",
+        "dl.gsu.by"
+      ].contains(contest.resource)) this.contests.add(contest);
     }
   }
 }

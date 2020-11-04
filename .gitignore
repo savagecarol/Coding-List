@@ -71,3 +71,5 @@
 
 
 key.properties
+upload_certificate.pem
+keystore.jks

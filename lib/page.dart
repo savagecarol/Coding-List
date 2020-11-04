@@ -3,8 +3,10 @@ import 'package:coding_list/fetchData.dart';
 import 'package:flutter/material.dart';
 
 openContestPage(Contest contest, BuildContext context) {
-  Navigator.push(context,
-      MaterialPageRoute(builder: (BuildContext context) => ContestPage(contest)));
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => ContestPage(contest)));
 }
 
 class ContestListWidget extends StatefulWidget {
@@ -44,6 +46,12 @@ class _ContestListWidgetState extends State<ContestListWidget> {
           var start =
               this.widget.contests[position].start.toString().split(" ");
           var end = this.widget.contests[position].end.toString().split(" ");
+          var nam = this
+              .widget
+              .contests[position]
+              .resource
+              .toLowerCase()
+              .split(".")[0];
           return InkWell(
               onTap: () {
                 openContestPage(this.widget.contests[position], context);
@@ -56,7 +64,7 @@ class _ContestListWidgetState extends State<ContestListWidget> {
                       padding: const EdgeInsets.fromLTRB(6.0, 6.0, 6.0, 0.0),
                       child: Text(
                         this.widget.contests[position].event,
-                        style: TextStyle(fontSize: 20.0),
+                        style: TextStyle(fontSize: 19.0),
                       ),
                     ),
                     Padding(
@@ -82,6 +90,25 @@ class _ContestListWidgetState extends State<ContestListWidget> {
                             Text(
                               start[1].split(".")[0],
                               style: TextStyle(fontSize: 14.0),
+                            )
+                          ],
+                        ),
+                        Column(
+                          children: <Widget>[
+                            Image.asset(
+                              'assets/icons/$nam.${[
+                                "yukicoder",
+                                "kaggle",
+                                "projecteuler",
+                                "codechef",
+                                "e-olymp",
+                                "opencup"
+                              ].contains(nam) ? "ico" : "png"}',
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container();
+                              },
+                              width: 32,
+                              height: 32,
                             )
                           ],
                         ),
