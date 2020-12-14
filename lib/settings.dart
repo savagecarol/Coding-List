@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share/share.dart';
 import 'package:coding_list/multiselect.dart';
 import 'package:coding_list/main.dart';
-import 'package:buy_me_a_coffee_widget/buy_me_a_coffee_widget.dart';
 
 Future<bool> getTheme() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -147,13 +146,6 @@ class _SettingsState extends State<Settings> {
             title: Text("Share"),
             subtitle: Text("Love the app! Share with your friends."),
             trailing: Icon(Icons.share),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30),
-            child: BuyMeACoffeeWidget(
-              sponsorID: "vikasgola",
-              theme: OrangeTheme(),
-            ),
           ),
         ],
       )),
